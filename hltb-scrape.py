@@ -24,6 +24,7 @@ hltb = "https://howlongtobeat.com/?q="
 start = str(8) #start row
 end = str(12) #end row
 
+
 def main():
     credentials = None
     if os.path.exists("token.json"):
