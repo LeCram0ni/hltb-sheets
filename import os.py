@@ -20,8 +20,8 @@ xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(sel
 hltb = "https://howlongtobeat.com/?q="
 
 
-start = str(2) #start row
-end = str(300) #end row
+start = str(8) #start row
+end = str(100) #end row
 
 
 def main():
@@ -78,7 +78,7 @@ def main():
 
                 num_elements = len(times[:3])           # Use the first 3 elements
                 times3 = times[:num_elements]           # Create the array with up to 3 entries
-                times3 += ["?"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
+                times3 += ["0"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
                 
                 print(times3)
                 
@@ -98,7 +98,7 @@ def main():
                     spreadsheetId=SPREADSHEET_ID,
                     range=f"{range_start}:{range_end}",  # Update the range to the new row
                     valueInputOption="RAW",
-                    body={"values": [[value,value2,value3]]}
+                    body={"values": [[float(value),float(value2),float(value3)]]}
                 )
                     
                 response = request.execute()
