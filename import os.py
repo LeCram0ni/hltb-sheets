@@ -1,5 +1,6 @@
 import re
 import os
+import functools 
 from time import sleep
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -21,7 +22,7 @@ hltb = "https://howlongtobeat.com/?q="
 
 
 start = str(8) #start row
-end = str(100) #end row
+end = str(12) #end row
 
 
 def main():
@@ -43,9 +44,21 @@ def main():
         resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":B"+end).execute()
         values = resultssheet.get("values", [])
 
-        print(xpath)
+        names  = functools.reduce(lambda acc, x: acc + [x[0]] if x else acc, values, [])
+        second = functools.reduce(lambda acc, x: acc + [x[1]] if x else acc, values, [])
+
+        #print(values)
+        #print(names)
+        #print(second)
+        #print(second[4])
 
         for index, row in enumerate(values,int(start)):  # Start at row start
+
+
+
+            print(index, row)
+            
+
 
             title = row[0]
             url = hltb+title
@@ -57,7 +70,7 @@ def main():
             driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
             driver.get(url)
             
-            sleep(1.5) #wait for search query
+            sleep(1.5) #wait for search query on hltb
 
             results = driver.find_elements(By.XPATH, xpath)
 
@@ -80,7 +93,7 @@ def main():
                 times3 = times[:num_elements]           # Create the array with up to 3 entries
                 times3 += ["0"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
                 
-                print(times3)
+                #print(times3)
                 
                 value = times3[0]
                 value2 = times3[1]
@@ -94,14 +107,14 @@ def main():
 
                 values_service = sheets.values()
 
-                request = values_service.update(
-                    spreadsheetId=SPREADSHEET_ID,
-                    range=f"{range_start}:{range_end}",  # Update the range to the new row
-                    valueInputOption="RAW",
-                    body={"values": [[float(value),float(value2),float(value3)]]}
-                )
+                # request = values_service.update(
+                #     spreadsheetId=SPREADSHEET_ID,
+                #     range=f"{range_start}:{range_end}",  # Update the range to the new row
+                #     valueInputOption="RAW",
+                #     body={"values": [[float(value),float(value2),float(value3)]]}
+                # )
                     
-                response = request.execute()
+                # response = request.execute()
 
         driver.quit()
 
