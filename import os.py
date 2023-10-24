@@ -15,19 +15,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
 
-xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]"
-
-#xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]" #masterchief, high on life
-
-#xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/div/div" #grid
-#xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li/div/div[2]/div"
-#xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/h3"  #game title
+xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" #not game title because of year numbers
 
 hltb = "https://howlongtobeat.com/?q="
 
 start = str(2) #start row
 end = str(83)
-#end = str(int(start)+10)
 
 def main():
     credentials = None
