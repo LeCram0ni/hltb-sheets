@@ -19,8 +19,10 @@ xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(sel
 
 hltb = "https://howlongtobeat.com/?q="
 
+
 start = str(2) #start row
-end = str(83) #end row
+end = str(300) #end row
+
 
 def main():
     credentials = None
@@ -38,7 +40,7 @@ def main():
     try:
         service = build("sheets", "v4", credentials=credentials)
         sheets = service.spreadsheets()
-        resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":A"+end).execute()
+        resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":B"+end).execute()
         values = resultssheet.get("values", [])
 
         print(xpath)
@@ -69,22 +71,24 @@ def main():
                 # times: all found times
                 # times3: all found times + fill up empty, always length 3
 
+
                 for match in matches:
-                    times.append(match[0].replace(' ',''))
+                    times.append(match[0].replace('½','.5').replace(' ',''))
+
 
                 num_elements = len(times[:3])           # Use the first 3 elements
                 times3 = times[:num_elements]           # Create the array with up to 3 entries
-                times3 += ["_"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
+                times3 += ["?"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
                 
                 print(times3)
-              
+                
                 value = times3[0]
                 value2 = times3[1]
                 value3 = times3[2]
 
                 times = []
                 times3 = []
-                
+                    
                 range_start = f"B{index}"  # Update row dynamically
                 range_end = f"D{index}"    # Update row dynamically
 
@@ -96,11 +100,13 @@ def main():
                     valueInputOption="RAW",
                     body={"values": [[value,value2,value3]]}
                 )
-                
+                    
                 response = request.execute()
+
+        driver.quit()
 
     except HttpError as error:
         print(error)
     
 if __name__ == "__main__":
-    main()    
+    main()
