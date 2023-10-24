@@ -20,7 +20,7 @@ xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(sel
 hltb = "https://howlongtobeat.com/?q="
 
 start = str(2) #start row
-end = str(83)
+end = str(83) #end row
 
 def main():
     credentials = None
