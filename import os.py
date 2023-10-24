@@ -14,8 +14,13 @@ import os
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
-xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/div/div"
+xpath  = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/div/div"
+#xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li/div/div[2]/div"
 hltb = "https://howlongtobeat.com/?q="
+
+start = str(2) #start row
+end = str(83)
+#end = str(int(start)+10)
 
 def main():
     credentials = None
@@ -33,11 +38,11 @@ def main():
     try:
         service = build("sheets", "v4", credentials=credentials)
         sheets = service.spreadsheets()
-        resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A2:A7").execute()
+        resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":A"+end).execute()
         values = resultssheet.get("values", [])
 
-        for index, row in enumerate(values,2):  # Start at row 2
-           # print(row)
+        for index, row in enumerate(values,int(start)):  # Start at row start
+
             title = row[0]
             url = hltb+title
 
@@ -46,8 +51,8 @@ def main():
 
             driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
             driver.get(url)
-            #wait for search query
-            sleep(1.5)
+            
+            sleep(1.5) #wait for search query
 
             results = driver.find_elements(By.XPATH, xpath)
 
@@ -58,35 +63,27 @@ def main():
 
                 times=[]
 
+                # times: all found times
+                # times3: all found times + fill up empty, always length 3
+
                 for match in matches:
                     times.append(match[0].replace(' ',''))
-                    print(times)
-           
-                value = times[0]
 
-                value2 = times[1] if len(times) > 1 else ''
+                # Determine the number of elements (between 1 and 3)
+                num_elements = len(times[:3])  # Use the first 3 elements
+                # Create the array with up to 3 entries
+                times3 = times[:num_elements]
+                # Fill the rest with "empty" to have exactly 3 elements
+                times3 += ["_"] * (3 - len(times3))
+                
+                print(times3)
+              
+                value = times3[0]
+                value2 = times3[1]
+                value3 = times3[2]
 
-                value3 = times[2] if len(times) > 2 else ''
-
-                if not value2:
-                    value2 = ""
-                if not value3:
-                    value3 = ""
-
-                # try:
-                #     value = times[0]
-                # except IndexError:
-                #     value = times[0]
-
-                # try:
-                #     value2 = times[1]
-                # except IndexError:
-                #     value2 = ''
-
-                # try:
-                #     value3 = times[2]
-                # except IndexError:
-                #     value3 = ''
+                times = []
+                times3 = []
                 
                 range_start = f"B{index}"  # Update row dynamically
                 range_end = f"D{index}"    # Update row dynamically
@@ -102,27 +99,8 @@ def main():
                 
                 response = request.execute()
 
-                # request = values_service.update(
-                #         spreadsheetId=SPREADSHEET_ID,
-                #         range=f"1!C"+str(i)+":C"+str(i),
-                #         valueInputOption="RAW",
-                #         body={"values": [[value2]]}
-                # )
-                # response = request.execute()
-
-                # request = values_service.update(
-                #         spreadsheetId=SPREADSHEET_ID,
-                #         range=f"1!D"+str(i)+":D"+str(i),  # Adjust the sheet name and cell range as needed
-                #         valueInputOption="RAW",
-                #         body={"values": [[value3]]}
-                # )
-                # response = request.execute()   
-
-
     except HttpError as error:
         print(error)
     
 if __name__ == "__main__":
-    main()
-    #'https://script.google.com/macros/s/AKfycbzwWH9c27i0FwsNTf6rgaffK8KuYrk5zyfVa967atmbIm_wsUfaPQequRi6MSZiPQgn-w/exec?text=testest'
-    
+    main()    
