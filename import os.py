@@ -1,3 +1,5 @@
+import re
+import os
 from time import sleep
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -9,8 +11,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-import re
-import os
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
@@ -19,7 +19,7 @@ xpath  = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/div/div"
 hltb = "https://howlongtobeat.com/?q="
 
 start = str(2) #start row
-end = str(83)
+end = str(10)
 #end = str(int(start)+10)
 
 def main():
@@ -48,6 +48,7 @@ def main():
 
             chrome_options = Options()
             chrome_options.add_argument("--headless")
+            chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
             driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
             driver.get(url)
@@ -69,12 +70,9 @@ def main():
                 for match in matches:
                     times.append(match[0].replace(' ',''))
 
-                # Determine the number of elements (between 1 and 3)
-                num_elements = len(times[:3])  # Use the first 3 elements
-                # Create the array with up to 3 entries
-                times3 = times[:num_elements]
-                # Fill the rest with "empty" to have exactly 3 elements
-                times3 += ["_"] * (3 - len(times3))
+                num_elements = len(times[:3])           # Use the first 3 elements
+                times3 = times[:num_elements]           # Create the array with up to 3 entries
+                times3 += ["_"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
                 
                 print(times3)
               
