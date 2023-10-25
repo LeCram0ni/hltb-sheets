@@ -20,10 +20,11 @@ xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(sel
 
 hltb = "https://howlongtobeat.com/?q="
 
+# row 1 : Name , Main, Main+Extra, Completionist
+# row 2 : first title
 
-start = str(8) #start row
-end = str(12) #end row
-
+start = str(2) #start row
+end = str(100) #end row
 
 def main():
     credentials = None
@@ -43,80 +44,81 @@ def main():
         sheets = service.spreadsheets()
         resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":B"+end).execute()
         values = resultssheet.get("values", [])
-
-        names  = functools.reduce(lambda acc, x: acc + [x[0]] if x else acc, values, [])
-        second = functools.reduce(lambda acc, x: acc + [x[1]] if x else acc, values, [])
-
-        #print(values)
-        #print(names)
-        #print(second)
-        #print(second[4])
+    
 
         for index, row in enumerate(values,int(start)):  # Start at row start
-
-
-
-            print(index, row)
             
-
-
             title = row[0]
-            url = hltb+title
 
-            chrome_options = Options()
-            chrome_options.add_argument("--headless")
-            chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-
-            driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
-            driver.get(url)
-            
-            sleep(1.5) #wait for search query on hltb
-
-            results = driver.find_elements(By.XPATH, xpath)
-
-            for result in results:
+            if len(row)<2: # if no time has been found / if only title has been found 
                 
-                pattern = re.compile(r'\d{1,4}.?')
-                matches = pattern.finditer(result.text)
+                if(index<10):
+                    print("# "+str(index)+" TIME? "+title)
+                else:
+                    print("#"+str(index)+" TIME? "+title)
 
-                times=[]
+                url = hltb+title
 
-                # times: all found times
-                # times3: all found times + fill up empty, always length 3
+                chrome_options = Options()
+                chrome_options.add_argument("--headless")
+                chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-
-                for match in matches:
-                    times.append(match[0].replace('½','.5').replace(' ',''))
-
-
-                num_elements = len(times[:3])           # Use the first 3 elements
-                times3 = times[:num_elements]           # Create the array with up to 3 entries
-                times3 += ["0"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
+                driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+                driver.get(url)
                 
-                #print(times3)
-                
-                value = times3[0]
-                value2 = times3[1]
-                value3 = times3[2]
+                sleep(1.5) #wait for search query on hltb
 
-                times = []
-                times3 = []
+                results = driver.find_elements(By.XPATH, xpath)
+
+                for result in results:
+
+                #  print("result")
+                #  print(result.text)
+                #  print("-------------")
                     
-                range_start = f"B{index}"  # Update row dynamically
-                range_end = f"D{index}"    # Update row dynamically
+                    pattern = re.compile(r'\d{1,4}.?')
+                    matches = pattern.finditer(result.text)
 
-                values_service = sheets.values()
+                    times=[]
 
-                # request = values_service.update(
-                #     spreadsheetId=SPREADSHEET_ID,
-                #     range=f"{range_start}:{range_end}",  # Update the range to the new row
-                #     valueInputOption="RAW",
-                #     body={"values": [[float(value),float(value2),float(value3)]]}
-                # )
-                    
-                # response = request.execute()
+                    # times: all found times
+                    # times3: all found times + fill up empty, always length 3
 
-        driver.quit()
+                    for match in matches:
+                        times.append(match[0].replace('½','.5').replace(' ',''))
+
+                    num_elements = len(times[:3])           # Use the first 3 elements
+                    times3 = times[:num_elements]           # Create the array with up to 3 entries
+                    times3 += ["0"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
+                
+                    value = times3[0]
+                    value2 = times3[1]
+                    value3 = times3[2]
+
+                    times = []
+                    times3 = []
+                        
+                    range_start = f"B{index}"  # Update row dynamically
+                    range_end = f"D{index}"    # Update row dynamically
+
+                    values_service = sheets.values()
+
+                    request = values_service.update(
+                        spreadsheetId=SPREADSHEET_ID,
+                        range=f"{range_start}:{range_end}",  # Update the range to the new row
+                        valueInputOption="RAW",
+                        body={"values": [[float(value),float(value2),float(value3)]]}
+                    )
+                        
+                    response = request.execute()
+
+            else:
+                if(index<10):
+                    print("# "+str(index)+" SKIP: "+title)
+                else:
+                    print("#"+str(index)+" SKIP: "+title)
+
+        #driver.quit()
 
     except HttpError as error:
         print(error)
