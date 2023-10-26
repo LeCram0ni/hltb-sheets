@@ -16,9 +16,11 @@ from webdriver_manager.chrome import ChromeDriverManager
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
 SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
 
-xpath = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" #not game title because of year numbers
+xpath_hltb = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" #not game title because of year numbers
+xpath_ta = "/html/body/form/div[2]/div[2]/main/div[3]/div[2]/div/table/tbody/tr/td[5]"
 
 hltb = "https://howlongtobeat.com/?q="
+ta = "https://www.trueachievements.com/gamer/marcipan/games"
 
 # row 1 : Name , Main, Main+Extra, Completionist
 # row 2 : first title
@@ -45,7 +47,6 @@ def main():
         resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":B"+end).execute()
         values = resultssheet.get("values", [])
     
-
         for index, row in enumerate(values,int(start)):  # Start at row start
             
             title = row[0]
@@ -68,7 +69,7 @@ def main():
                 
                 sleep(1.5) #wait for search query on hltb
 
-                results = driver.find_elements(By.XPATH, xpath)
+                results = driver.find_elements(By.XPATH, xpath_hltb)
 
                 for result in results:
 
