@@ -116,7 +116,6 @@ def main():
                         
                     response = request.execute()
 
-
             elif len(row) < 5:
 
                 #print(edit)
@@ -165,7 +164,7 @@ def main():
 
                    
 
-                    #values_service = sheets.values()
+                    values_service = sheets.values()
 
                     #request = values_service.update(
                     #    spreadsheetId=SPREADSHEET_ID,
@@ -176,7 +175,6 @@ def main():
                         
                     #response = request.execute()
                 
-
             else:
                 if(index<10):
                     print("# "+str(index)+" SKIP: "+title)
