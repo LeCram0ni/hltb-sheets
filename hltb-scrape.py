@@ -44,15 +44,18 @@ def main():
     try:
         service = build("sheets", "v4", credentials=credentials)
         sheets = service.spreadsheets()
-        resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":B"+end).execute()
+        resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":E"+end).execute()
         values = resultssheet.get("values", [])
     
         for index, row in enumerate(values,int(start)):  # Start at row start
             
             title = row[0]
+            #edit = ""
 
-            if len(row)<2: # if no time has been found / if only title has been found 
-                
+            if row[1] == "": # if no time has been found / if only title has been found 
+
+                #edit = "time"
+
                 if(index<10):
                     print("# "+str(index)+" TIME? "+title)
                 else:
@@ -112,6 +115,67 @@ def main():
                     )
                         
                     response = request.execute()
+
+
+            elif len(row) < 5:
+
+                #print(edit)
+                #edit = edit+"GS"
+                #print(edit)
+
+                if(index<10):
+                    print("# "+str(index)+" GSCR? "+title)
+                else:
+                    print("#"+str(index)+" GSCR? "+title)
+
+                
+                url = ta
+
+                chrome_options = Options()
+                chrome_options.add_argument("--headless")
+                chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+                driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
+                driver.get(url)
+                
+                sleep(1.5) 
+
+                results = driver.find_elements(By.XPATH, xpath_ta)
+
+                for result in results:
+
+                #  print("result")
+                #  print(result.text)
+                #  print("-------------")
+                    
+                    pattern = re.compile(r'\(\d{1,3}\)|\(\d\,\d{3}\)')
+                    matches = pattern.finditer(result.text)
+
+                    times=[0]
+
+                    for match in matches:
+                        times.append(match[0].replace('(','').replace(')',''))
+                
+                    value = times
+
+                    times = []
+                        
+                    range_start = f"E{index}"  # Update row dynamically
+                    range_end = f"E{index}"    # Update row dynamically
+
+                   
+
+                    #values_service = sheets.values()
+
+                    #request = values_service.update(
+                    #    spreadsheetId=SPREADSHEET_ID,
+                    #    range=f"{range_start}:{range_end}",  # Update the range to the new row
+                    #    valueInputOption="RAW",
+                    #    body={"values": [[str(value)]]}
+                    #)
+                        
+                    #response = request.execute()
+                
 
             else:
                 if(index<10):
