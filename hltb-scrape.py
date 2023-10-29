@@ -52,7 +52,10 @@ def main():
             title = row[0]
             #edit = ""
 
-            if row[1] == "": # if no time has been found / if only title has been found 
+            if len(row[0])==0:
+                break
+            
+            elif row[1] == "": # if no time has been found / if only title has been found 
 
                 #edit = "time"
 
@@ -161,8 +164,6 @@ def main():
                         
                     range_start = f"E{index}"  # Update row dynamically
                     range_end = f"E{index}"    # Update row dynamically
-
-                   
 
                     values_service = sheets.values()
 
