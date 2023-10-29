@@ -16,7 +16,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
 SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
 
-xpath_hltb = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" #not game title because of year numbers
+xpath_hltb = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" # exclude game title because of year numbers
 xpath_ta = "/html/body/form/div[2]/div[2]/main/div[3]/div[2]/div/table/tbody/tr/td[5]"
 
 hltb = "https://howlongtobeat.com/?q="
@@ -52,15 +52,19 @@ def main():
         resultssheet = sheets.values().get(spreadsheetId=SPREADSHEET_ID, range="1!A"+start+":E"+end).execute()
         values = resultssheet.get("values", [])
     
+
+# R O W
+
         for index, row in enumerate(values,int(start)):  # Start at row start
-            
+
             title = row[0]
             #edit = ""
 
             if len(row[0])==0:
                 break
-            
-            elif row[1] == "" or row[1] == updateZero: # if no time has been found / if only title has been found 
+
+            # if no time has been found / if only title has been found OR if times = 0 if updatezero is true
+            elif row[1] == "" or row[1] == updateZero: 
 
                 #edit = "time"
 
@@ -103,15 +107,15 @@ def main():
                     times3 = times[:num_elements]           # Create the array with up to 3 entries
                     times3 += ["0"] * (3 - len(times3))     # Fill the rest with "empty" to have exactly 3 elements
                 
-                    value = times3[0]
-                    value2 = times3[1]
-                    value3 = times3[2]
+                    t1 = times3[0]
+                    t2 = times3[1]
+                    t3 = times3[2]
 
                     times = []
                     times3 = []
                         
-                    range_start = f"B{index}"  # Update row dynamically
-                    range_end = f"D{index}"    # Update row dynamically
+                    range_start = f"B{index}" 
+                    range_end = f"D{index}"    
 
                     values_service = sheets.values()
 
@@ -119,22 +123,18 @@ def main():
                         spreadsheetId=SPREADSHEET_ID,
                         range=f"{range_start}:{range_end}",  # Update the range to the new row
                         valueInputOption="RAW",
-                        body={"values": [[float(value),float(value2),float(value3)]]}
+                        body={"values": [[float(t1),float(t2),float(t3)]]}
                     )
                         
                     response = request.execute()
 
-            elif len(row) < 5:
-
-                #print(edit)
-                #edit = edit+"GS"
-                #print(edit)
+            # if < 5 in final program
+            elif len(row) < 6:
 
                 if(index<10):
                     print("# "+str(index)+" GSCR? "+title)
                 else:
                     print("#"+str(index)+" GSCR? "+title)
-
                 
                 url = ta
 
@@ -158,28 +158,28 @@ def main():
                     pattern = re.compile(r'\(\d{1,3}\)|\(\d\,\d{3}\)')
                     matches = pattern.finditer(result.text)
 
-                    times=[0]
+                    scores=[]
 
                     for match in matches:
-                        times.append(match[0].replace('(','').replace(')',''))
-                
-                    value = times
-
-                    times = []
+                        scores.append(match[0].replace('(','').replace(')',''))
+                        
+                    gs = scores
+                    print(scores)
+                    scores = []
                         
                     range_start = f"E{index}"  # Update row dynamically
                     range_end = f"E{index}"    # Update row dynamically
 
                     values_service = sheets.values()
 
-                    #request = values_service.update(
-                    #    spreadsheetId=SPREADSHEET_ID,
-                    #    range=f"{range_start}:{range_end}",  # Update the range to the new row
-                    #    valueInputOption="RAW",
-                    #    body={"values": [[str(value)]]}
-                    #)
+                    request = values_service.update(
+                        spreadsheetId=SPREADSHEET_ID,
+                        range=f"{range_start}:{range_end}",  # Update the range to the new row
+                        valueInputOption="RAW",
+                        body={"values": [[str(gs)]]}
+                    )
                         
-                    #response = request.execute()
+                    response = request.execute()
                 
             else:
                 if(index<10):
