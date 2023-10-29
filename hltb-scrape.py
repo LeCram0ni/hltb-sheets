@@ -28,6 +28,11 @@ ta = "https://www.trueachievements.com/gamer/marcipan/games"
 start = str(2) #start row
 end = str(100) #end row
 
+updateZero = True
+
+if(updateZero):
+    updateZero = "0"
+
 def main():
     credentials = None
     if os.path.exists("token.json"):
@@ -55,7 +60,7 @@ def main():
             if len(row[0])==0:
                 break
             
-            elif row[1] == "": # if no time has been found / if only title has been found 
+            elif row[1] == "" or row[1] == updateZero: # if no time has been found / if only title has been found 
 
                 #edit = "time"
 
