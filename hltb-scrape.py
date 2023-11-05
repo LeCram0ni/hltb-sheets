@@ -12,12 +12,20 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.common import NoSuchElementException, ElementNotInteractableException
+from selenium.webdriver.support import expected_conditions as EC
 
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
 SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
 
 xpath_hltb = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" # exclude game title because of year numbers
 xpath_ta = "/html/body/form/div[2]/div[2]/main/div[3]/div[2]/div/table/tbody/tr/td[5]"
+
+
+#show ALL games: AJAXList.Buttons('oGamerGamesListA')
+#trigger javascript
+
 
 hltb = "https://howlongtobeat.com/?q="
 ta = "https://www.trueachievements.com/gamer/marcipan/games"
@@ -26,9 +34,9 @@ ta = "https://www.trueachievements.com/gamer/marcipan/games"
 # row 2 : first title
 
 start = str(2) #start row
-end = str(100) #end row
+end = str(2) #end row
 
-updateZero = True
+updateZero = False
 
 if(updateZero):
     updateZero = "0"
@@ -76,7 +84,7 @@ def main():
                 url = hltb+title
 
                 chrome_options = Options()
-                chrome_options.add_argument("--headless")
+                #chrome_options.add_argument("--headless")
                 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
                 driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
@@ -139,11 +147,32 @@ def main():
                 url = ta
 
                 chrome_options = Options()
-                chrome_options.add_argument("--headless")
+                #chrome_options.add_argument("--headless")
                 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
                 driver = Chrome(service=Service(ChromeDriverManager().install()),options=chrome_options)
                 driver.get(url)
+
+                print("starting_Driver")
+                click_button = driver.find_element(by=By.XPATH, value='//*[@id="oGamerGamesListContent"]/div[1]/ul/li[1]/a')
+                #print(click_button.text)
+                #sleep(10)
+                #cookieButton = driver.find_element(by=By.XPATH, value='/html/body/div/div[2]/div[3]/button[3]')
+                #sleep(7)
+                cookieButton = driver.find_element(by=By.XPATH, value='//*[@id="notice"]/div[3]/button[3]')
+
+                #sleep(10)
+                cookieButton.click()
+                click_button.click()
+
+
+                #js = 'alert("Hello World")'
+                #driver.execute_script(js)
+
+                #script = "AJAXList.Buttons('oGamerGamesListA'); " \
+                #         "return false;"
+
+                #driver.execute_async_script(script)
                 
                 sleep(1.5) 
 
@@ -151,9 +180,9 @@ def main():
 
                 for result in results:
 
-                #  print("result")
-                #  print(result.text)
-                #  print("-------------")
+                    print("result")
+                    print(result.text)
+                    print("-------------")
                     
                     pattern = re.compile(r'\(\d{1,3}\)|\(\d\,\d{3}\)')
                     matches = pattern.finditer(result.text)
