@@ -17,7 +17,7 @@ from selenium.common import NoSuchElementException, ElementNotInteractableExcept
 from selenium.webdriver.support import expected_conditions as EC
 
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
-SPREADSHEET_ID = "1c7ccXCJUaw7idXht-UOJkomjpd-SGYrxx8g6gLuRNSw"
+SPREADSHEET_ID = "SPREADSHEETID"
 
 xpath_hltb = "/html/body/div[1]/div/main/div/div/div[5]/ul/li[1]/div/div[2]/*[not(self::h3)]" # exclude game title because of year numbers
 xpath_ta = "/html/body/form/div[2]/div[2]/main/div[3]/div[2]/div/table/tbody/tr/td[5]"
@@ -28,7 +28,7 @@ xpath_ta = "/html/body/form/div[2]/div[2]/main/div[3]/div[2]/div/table/tbody/tr/
 
 
 hltb = "https://howlongtobeat.com/?q="
-ta = "https://www.trueachievements.com/gamer/marcipan/games"
+ta = "https://www.trueachievements.com/gamer/USERNAME/games"
 
 # row 1 : Name , Main, Main+Extra, Completionist
 # row 2 : first title
